@@ -1,21 +1,22 @@
 {% load static %}
+{% load i18n %}
 
 <!DOCTYPE html>
 <html>
 <head>
-<title>{% block title %} {% endblock title %}</title>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/animate.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/font.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/li-scroller.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/slick.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.fancybox.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/theme.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<title>{% block title %}{% endblock title %}</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/animate.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/font.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/li-scroller.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/slick.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.fancybox.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 <body>
 <div id="preloader">
@@ -32,9 +33,20 @@
               <li><a href="{% url 'home_page' %}">Bosh sahifa</a></li>
               <li><a href="#">Biz haqimizda</a></li>
               <li><a href="{% url 'contact_page' %}">Biz bilan aloqa</a></li>
+              {% if user.is_authenticated and user.is_superuser %}
+                <li><a href="{% url 'admin_page' %}">Admin sahifasi</a></li>
+              {% endif %}
+
+
             </ul>
           </div>
           <div class="header_top_right">
+            {% if request.user.is_authenticated %}
+              <p><a href="{% url 'logout' %}" style="color:palegreen">Logout</a></p>
+              <p><a href="{% url 'user_profile' %}" style="color:palegreen">My profile</a></p>
+            {% else %}
+              <p><a href="{% url 'login' %}" style="color:palegreen">Saytga kirish</a></p>
+            {% endif %}
             <p>{% now 'jS F Y H:i' %}</p>
           </div>
         </div>
@@ -54,13 +66,17 @@
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav main_nav">
-          <li class="active"><a href="{% url 'home_page' %}"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Bosh sahifa</span></a></li>
+          <li class="active"><a href="{% url 'home_page' %}"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Home</span></a></li>
           <li><a href="{% url 'local_news_page' %}">Mahalliy</a></li>
           <li><a href="{% url 'foreign_news_page' %}">Xorij</a></li>
           <li><a href="{% url 'technology_news_page' %}">Texnalogiya</a></li>
           <li><a href="{% url 'sport_news_page' %}">Sport</a></li>
           <li><a href="{% url 'contact_page' %}">Biz bilan aloqa</a></li>
-          <!--<li><a href="{% url 'error_page' %}">404 Page</a></li>-->
+          <li>
+            <form method="get" action="{% url 'search_result' %}">
+              <input type="search" name="q" placeholder="Qidiruv" class="form-control">
+            </form>
+          </li>
         </ul>
       </div>
     </nav>
@@ -71,7 +87,7 @@
         <div class="latest_newsarea"> <span>Latest News</span>
           <ul id="ticker01" class="news_sticker">
             {% for news in latest_news %}
-              <li><a href="#"><img src="{{ news.image.url }}" alt="">{{ news.title }}</a></li>
+            <li><a href="#"><img src="{{ news.image.url }}" alt="">{{ news.title }}</a></li>
             {% endfor %}
           </ul>
           <div class="social_area">
@@ -89,9 +105,10 @@
         </div>
       </div>
     </div>
+  </section>
 
     {% block content %}
-    {% endblock content  %}
+    {% endblock content %}
 
     <footer id="footer">
     <div class="footer_top">
@@ -103,13 +120,13 @@
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4">
           <div class="footer_widget wow fadeInDown">
-            <h2>Taglar</h2>
+            <h2>Teglar</h2>
             <ul class="tag_nav">
-
-              {% for kategoriya in categories %}
-              <li><a href="#">{{ kategoriya.name }}</a></li>
-              {% endfor %}
-
+              <li><a href="{% url 'local_news_page' %}">Mahalliy</a></li>
+              <li><a href="{% url 'foreign_news_page' %}">Xorij</a></li>
+              <li><a href="{% url 'technology_news_page' %}">Texnalogiya</a></li>
+              <li><a href="{% url 'sport_news_page' %}">Sport</a></li>
+              <li><a href="{% url 'contact_page' %}">Contact Us</a></li>
             </ul>
           </div>
         </div>
@@ -125,11 +142,12 @@
       </div>
     </div>
     <div class="footer_bottom">
-      <p class="copyright">Copyright &copy; 2045 <a href="index.html">NewsFeed</a></p>
+      <p class="copyright">Copyright &copy; 2045 <a href="home.html">NewsFeed</a></p>
       <p class="developer">Developed By Wpfreeware</p>
     </div>
   </footer>
 </div>
+
 {% block javascript %}
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/wow.min.js' %}"></script>
@@ -140,7 +158,8 @@
 <script src="{% static 'js/jquery.fancybox.pack.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>
 <script src="{% static 'js/html5shiv.min.js' %}"></script>
-<script src="{% static 'js/respond.min.js' %}"></script>
+<script src="{% static 'js/respond.min.js' %}></script>
 {% endblock javascript %}
+
 </body>
 </html>
